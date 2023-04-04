@@ -15,6 +15,7 @@ class Plane {
         int tempoEspera;    // tempo maximo que um avião pode esperar até sair da fila OBS: adicionar tolerancia de 10% para decolagens
         int Emergencia;     // decidir aleatoriamente, se for 1 é emergência, senão não
         int prioridade;
+        int atraso = 0;
         char acao;          // Pouso (p) ou Decolagem (d)
         string idVoo;       // origem ou destino, a depender se é pouso ou decolagem 3 digitos
         string idAviao;     // 2 letras (empresa) e 3 números (numero do voo)
@@ -26,10 +27,10 @@ class Plane {
         int getCombustivel();
         int getTempoEspera();
         int getPrioridade();
+        int getAtraso();
         char getAcao();
-        void setAcao(char a);
         void setPrioridade(int novapr);
-        void setCombustivel(int c);
+        void aumentaTempoEspera();
         void gastaCombustivel();
         string getIdAviao();
         string getIdVoo();

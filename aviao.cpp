@@ -12,6 +12,10 @@ int Plane::getTempoEspera(){
     return this->tempoEspera;
 }
 
+int Plane::getAtraso(){
+    return this->atraso;
+}
+
 char Plane::getAcao(){
     return this->acao;
 }
@@ -21,19 +25,16 @@ string Plane::getIdAviao(){
 }
 
 string Plane::getIdVoo(){
-    return this->idAviao;
+    return this->idVoo;
 }
 
-void Plane::setAcao(char a){
-    this->acao = a;
+void Plane::aumentaTempoEspera(){
+    this->tempoEspera += 1;
+    this->atraso += 1;
 }
 
 void Plane::setPrioridade(int novapr){
     this->prioridade = novapr;
-}
-
-void Plane::setCombustivel(int c){
-    this->combustivel = c;
 }
 
 void Plane::gastaCombustivel(){
