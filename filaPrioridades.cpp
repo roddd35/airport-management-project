@@ -52,11 +52,13 @@ void PriorityQueue::resizePriorityQueue(){
 
 void PriorityQueue::writeQueue(){
     cout << endl;
-    for(int i = 0; i < this->n; i++){
-        if(this->v[i].getAcao() == 'p')
-            cout << "Aviao: " << this->v[i].getIdAviao() << " Origem: " << this->v[i].getIdVoo() << " Combustível: " << this->v[i].getCombustivel() << endl;
-        else
-            cout << "Aviao: " << this->v[i].getIdAviao() << " Destino: " << this->v[i].getIdVoo() << " Saída: " << this->v[i].getTempoEspera() << "h" << endl;
+    if(this->n != 0){
+        for(int i = 0; i < this->n; i++){
+            if(this->v[i].getAcao() == 'p')
+                cout << "Aviao: " << this->v[i].getIdAviao() << " Origem: " << this->v[i].getIdVoo() << " Combustível: " << this->v[i].getCombustivel() << endl;
+            else
+                cout << "Aviao: " << this->v[i].getIdAviao() << " Destino: " << this->v[i].getIdVoo() << " Saída: " << this->v[i].getTempoEspera() << "h" << endl;
+        }
     }
     cout << endl;
 }
@@ -83,6 +85,8 @@ void PriorityQueue::sobe(int i){
         aux = this->v[pai];
         this->v[pai] = this->v[filho];
         this->v[filho] = aux;
+
+        aux.~Plane();
 
         this->indice[this->v[pai].getPrioridade()] = pai;
         this->indice[this->v[filho].getPrioridade()] = filho;

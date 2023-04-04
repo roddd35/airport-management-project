@@ -41,7 +41,7 @@ void execucao(int tempoTotal, int qtdAvioes, int probPouso, int probEmergencia, 
     for(int i = 0; i < tempoTotal; i++){ 
         cout << endl << "-*- Turno Atual: " << i + 1 << " -*-" << endl;
         // criar os objetos do avião
-        for(int j = 0; j < qtdAvioes; j++){
+        for(int j = 0; j < qtdAvioes + 1; j++){
             decisaoEmergencia = decideEmergencia(probEmergencia);
             decisaoAcao = decideAcao(probPouso);
             idAviao = geradorIdAviao();
