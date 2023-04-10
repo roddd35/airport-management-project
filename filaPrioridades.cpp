@@ -50,16 +50,31 @@ void PriorityQueue::resizePriorityQueue(){
     this->max = 2 * this->max;
 }
 
+void PriorityQueue::removeLandingPlanes(int *qtdAvioesRetirados, int i){
+    this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
+    *qtdAvioesRetirados += 1;
+    this->n -= 1;
+}
+
 void PriorityQueue::writeQueue(){
+    int qtdCombustivel = 0;
+    int qtdAvioesPouso = 0;
+    double media;
     cout << endl;
     if(this->n != 0){
         for(int i = 0; i < this->n; i++){
-            if(this->v[i].getAcao() == 'p')
+            if(this->v[i].getAcao() == 'p'){
                 cout << "Aviao: " << this->v[i].getIdAviao() << " Origem: " << this->v[i].getIdVoo() << " Combustível: " << this->v[i].getCombustivel() << endl;
+                qtdCombustivel += this->v[i].getCombustivel();
+                qtdAvioesPouso++;
+            }
             else
                 cout << "Aviao: " << this->v[i].getIdAviao() << " Destino: " << this->v[i].getIdVoo() << " Saída: " << this->v[i].getTempoEspera() << "h" << endl;
         }
     }
+    media = qtdCombustivel / qtdAvioesPouso;
+    cout.precision(2);
+    cout << "Média de Combustível dos Aviões na fila: " << fixed << media;
     cout << endl;
 }
 
@@ -146,7 +161,7 @@ int PriorityQueue::removePriorityQueue(string idVoo, string idAviao, int index){
     return 0;
 }
 
-int PriorityQueue::removePlanes(int qtdAvioesRetirados, int *pista1, int *pista2, int *pista3, int tempoAtual, int *qtdOutroAeroporto, int *qtdPousos, int *qtdDecolagens, int *decolagensSemAtraso){
+int PriorityQueue::removePlanes(int qtdAvioesRetirados, int *pista1, int *pista2, int *pista3, int tempoAtual, int *qtdOutroAeroporto, int *qtdPousos, int *qtdDecolagens, int *decolagensSemAtraso, int *emergenciasAtendidas){
     int contaPrioridade = 0;
 
     // deve vir antes pois só pode decolar nesse aeroporto
@@ -155,79 +170,73 @@ int PriorityQueue::removePlanes(int qtdAvioesRetirados, int *pista1, int *pista2
             if(*pista3 == 0){
                 *pista3 = 3; //desativada por 3 turnos
                 cout << "O avião: " << this->v[i].getIdAviao() << " com destino: " << this->v[i].getIdVoo() << " decolou na pista 3, com atraso de: " << this->v[i].getAtraso() << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdDecolagens += 1;
                 if(this->v[i].getAtraso() == 0)
                     *decolagensSemAtraso += 1;
-                qtdAvioesRetirados++;
-                this->n -= 1;
             }
             else if(*pista1 == 0){
                 *pista1 = 3;
                 cout << "O avião: " << this->v[i].getIdAviao() << " com destino: " << this->v[i].getIdVoo() << " decolou na pista 1, com atraso de: " << this->v[i].getAtraso() << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdDecolagens += 1;
                 if(this->v[i].getAtraso() == 0)
                     *decolagensSemAtraso += 1;
-                this->n -= 1;
             }
             else if(*pista2 == 0){
                 *pista2 = 3;
-                cout << "O avião: " << this->v[i].getIdAviao() << " com destino: " << this->v[i].getIdVoo() << " decolou na pista 3, com atraso de: " << this->v[i].getAtraso() << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                cout << "O avião: " << this->v[i].getIdAviao() << " com destino: " << this->v[i].getIdVoo() << " decolou na pista 2, com atraso de: " << this->v[i].getAtraso() << endl;
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdDecolagens += 1;
                 if(this->v[i].getAtraso() == 0)
                     *decolagensSemAtraso += 1;
-                this->n -= 1;
             }
             else
                 this->v[i].aumentaTempoEspera();
         }
-
+    }
+    for(int i = 0; i < this->n; i++){
         // remover aviões de EMERGÊNCIA ou SEM COMBUSTÍVEL! 
-        else if(this->v[i].getPrioridade() == 3 || (this->v[i].getPrioridade() == 2 && this->v[i].getAcao() == 'p' && this->v[i].getCombustivel() == 0)){
+        if(this->v[i].getPrioridade() == 3 || (this->v[i].getPrioridade() == 2 && this->v[i].getAcao() == 'p' && this->v[i].getCombustivel() == 0)){
             if(*pista1 == 0){
                 *pista1 = 3;
                 if(this->v[i].getPrioridade() == 2)
                     cout << "O avião: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 1 sem combustível!" << endl;
-                else
-                    cout << "O avião emergencial: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 1!" << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                else{
+                    *emergenciasAtendidas += 1;
+                    cout << "O avião emergencial: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 3!" << endl;
+                }
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdPousos += 1;
-                this->n -= 1;
             }
             else if(*pista2 == 0){
                 *pista2 = 3;
                 if(this->v[i].getPrioridade() == 2)
                     cout << "O avião: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 3 sem combustível!" << endl;
-                else
+                else{
+                    *emergenciasAtendidas += 1;
                     cout << "O avião emergencial: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 3!" << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                }
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdPousos += 1;
-                this->n -= 1;
             }
             else if(*pista3 == 0 && this->v[i].getPrioridade() == 3){   // apenas aviões de emergência podem pousar na pista 3
                 *pista3 = 3;
                 cout << "O avião emergencial: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 3!" << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                removeLandingPlanes(&qtdAvioesRetirados, i);
+                *emergenciasAtendidas += 1;
                 *qtdPousos += 1;
-                this->n -= 1;
             }
             else{
                 if(this->v[i].getPrioridade() == 2)
                     cout << "O avião: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " foi enviado para outro aeroporto sem combustível!" << endl;
-                else
-                    cout << "O avião emergencial: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " foi enviado para outro aeroporto!" << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                else{
+                    *emergenciasAtendidas += 1;
+                    cout << "O avião emergencial: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 3!" << endl;
+                }
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdPousos += 1;
                 *qtdOutroAeroporto += 1;
-                this->n -= 1;
             }
         }
     }
@@ -237,18 +246,14 @@ int PriorityQueue::removePlanes(int qtdAvioesRetirados, int *pista1, int *pista2
             if(*pista1 == 0){
                 *pista1 = 3;
                 cout << "O avião: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 1!" << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdPousos += 1;
-                this->n -= 1;
             }
             else if(*pista2 == 0){
                 *pista2 = 3;
                 cout << "O avião: " << this->v[i].getIdAviao() << " de voo: " << this->v[i].getIdVoo() << " pousou na pista 3!" << endl;
-                this->removePriorityQueue(this->v[i].getIdAviao(), this->v[i].getIdVoo(), i);
-                qtdAvioesRetirados++;
+                removeLandingPlanes(&qtdAvioesRetirados, i);
                 *qtdPousos += 1;
-                this->n -= 1;
             }
         }
     }

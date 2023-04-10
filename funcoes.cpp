@@ -32,6 +32,9 @@ void execucao(int tempoTotal, int qtdAvioes, int probPouso, int probEmergencia, 
     int qtdOutroAeroporto = 0;
     int qtdPousos = 0;
     int qtdDecolagens = 0;
+    int totalAvioes = 0;
+    int totalEmergencia = 0;
+    int emergenciasAtendidas = 0;
     char decisaoAcao;
     string idAviao;
     string idVoo;
@@ -56,14 +59,17 @@ void execucao(int tempoTotal, int qtdAvioes, int probPouso, int probEmergencia, 
                 combustivel = 0;
                 tempoEspera = decideMaxDecolagem(tempoVoo);
             }
-            if(decisaoEmergencia == 1 && decisaoAcao != 'd')
-                prioridade = 4; // maior prioridade
+            if(decisaoEmergencia == 1 && decisaoAcao != 'd'){
+                prioridade = 3; // maior prioridade
+                totalEmergencia++;
+            }
             else
                 prioridade = 1;
             Plane *aviao = new Plane(combustivel, tempoEspera + i, decisaoEmergencia, prioridade, decisaoAcao, idVoo, idAviao);
             fila->insertPriorityQueue(aviao);
+            totalAvioes++;
         }
-        qtdAvioesRetirados = fila->removePlanes(qtdAvioesRetirados, &pista1, &pista2, &pista3, i, &qtdOutroAeroporto, &qtdPousos, &qtdDecolagens, &totalDecolagensSemAtraso);
+        qtdAvioesRetirados = fila->removePlanes(qtdAvioesRetirados, &pista1, &pista2, &pista3, i, &qtdOutroAeroporto, &qtdPousos, &qtdDecolagens, &totalDecolagensSemAtraso, &emergenciasAtendidas);
         cout << endl << "Nesse turno, o total de pousos ou decolagens é: " << qtdAvioesRetirados << endl;
         fila->adjustPriority(i);
 
@@ -78,11 +84,20 @@ void execucao(int tempoTotal, int qtdAvioes, int probPouso, int probEmergencia, 
         fila->writeQueue();
     }
 
-    cout << endl << "Dados Finais: " << endl;
-    cout << "Dentre os " << qtdPousos << " pousos realizados, tivemos " << qtdOutroAeroporto << " feitos em outro aeroporto!" << endl;
-    cout << "Dentre as " << qtdDecolagens << " decolagens realizadas, tivemos " << totalDecolagensSemAtraso << " feitas sem atraso!"<< endl;
+    imprimeEstatisticas(totalAvioes, totalEmergencia, qtdDecolagens, totalDecolagensSemAtraso, qtdPousos, qtdOutroAeroporto, emergenciasAtendidas);
 
     fila->~PriorityQueue();
+}
+
+void imprimeEstatisticas(int totalAvioes, int totalEmergencia, int qtdDecolagens, int totalDecolagensSemAtraso, int qtdPousos, int qtdOutroAeroporto, int emergenciasAtendidas){
+    cout << endl << "-*- ESTATÍSTICAS DA SIMULAÇÃO -*-: " << endl;
+    cout << endl << "Quantidade de Aviões gerados: " << totalAvioes << endl;
+    cout << "Quantidade de Aviões de emergência gerados: " << totalEmergencia << endl << endl;
+    cout << "Quantidade de decolagens realizadas: " << qtdDecolagens << endl;
+    cout << "Quantidade de decolagens realizadas sem atraso: " << totalDecolagensSemAtraso << endl;
+    cout << "Quantidade de pousos totais: " << qtdPousos << endl;
+    cout << "Quantidade de pousos realizados em outro aeroporto: " << qtdOutroAeroporto << endl;
+    cout << "Quantidade de emergências atendidas: " << emergenciasAtendidas << endl;    
 }
 
 int decideEmergencia(int probEmergencia){

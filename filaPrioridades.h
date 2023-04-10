@@ -21,7 +21,8 @@ class PriorityQueue{
         int isEmpty();
         int removePriorityQueue(string idVoo, string idAviao, int index);
         int getElemento(int posicao);
-        int removePlanes(int qtdAvioesRetirados, int *pista1, int *pista2, int *pista3, int tempoAtual, int *qtdOutroAeroporto, int *qtdPousos, int *qtdDecolagens, int *decolagensSemAtraso);
+        int removePlanes(int qtdAvioesRetirados, int *pista1, int *pista2, int *pista3, int tempoAtual, int *qtdOutroAeroporto, int *qtdPousos, int *qtdDecolagens, int *decolagensSemAtraso, int *emergenciasAtendidas);
+        void removeLandingPlanes(int *qtdAvioesRetirados, int i);
         void resizePriorityQueue();
         void insertPriorityQueue(Plane *x);
         void changePriority(int indice, int novapr);
